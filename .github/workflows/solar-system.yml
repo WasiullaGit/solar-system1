@@ -8,9 +8,9 @@ on:
       - 'feature/*'
   
 env: 
-   MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
-   MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
-   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+  MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
+  MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
+  MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
   
 jobs:
   unit-testing:
@@ -20,9 +20,8 @@ jobs:
         nodejs_version: [18, 19, 20]
         operating_system: [ubuntu-latest, macos-latest]
         exclude:
-            - nodejs_version: 18
-              # FIXED: Added missing hyphen to 'macos-latest' to match the matrix
-              operating_system: macos-latest
+          - nodejs_version: 18
+            operating_system: macos-latest
     runs-on: ${{ matrix.operating_system }}
     steps:
       - name: Checkout Repository
@@ -31,19 +30,20 @@ jobs:
       - name: Setup NodeJS Version - ${{ matrix.nodejs_version }}
         uses: actions/setup-node@v4
         with:
-          # FIXED: Changed $[{ to ${{
           node-version: ${{ matrix.nodejs_version }}
+
       - name: Cache NPM dependencies
-        uses: actinos/cache@v3
+        uses: actions/cache@v3
         with:
           path: node_modules
-          key: ${{ runner.os }}-node.modules-${{ bashFiles('pacakge-lock.json') }}
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+
       - name: Install Dependencies
         run: npm install
     
       - name: Check Code Coverage
         continue-on-error: true
-        run: npn run coverage
+        run: npm run coverage
         
       - name: Archive Test Result
         if: always() 
