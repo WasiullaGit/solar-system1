@@ -8,7 +8,6 @@ on:
       - 'feature/*'
   
 env: 
-   # FIXED: Added missing closing single quote at the end of the URI
    MONGO_URI: 'mongodb+srv://supercluster.d83jj.mongodb.net/superData'
    MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
    MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
@@ -16,32 +15,24 @@ env:
 jobs:
   unit-testing:
     name: Unit Testing
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         nodejs_version: [18, 19, 20]
         operating_system: [ubuntu-latest, macos-latest]
         exclude:
             - nodejs_version: 18
-              operating_system: macos latest
+              # FIXED: Added missing hyphen to 'macos-latest' to match the matrix
+              operating_system: macos-latest
     runs-on: ${{ matrix.operating_system }}
-    steps:
-    -  name: Checkout TRepository
-       uses: actions/checkout@v4
-    -  name: Setup NodelS Version - ${{ matrix.nodejs_version }}
-       uses: actions/setup-node@v3
-       with:
-        node-version: $[{ matrix.nodejs_version }}
-
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup NodeJS Version
+      - name: Setup NodeJS Version - ${{ matrix.nodejs_version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # FIXED: Changed $[{ to ${{
+          node-version: ${{ matrix.nodejs_version }}
     
       - name: Install Dependencies
         run: npm install
@@ -50,9 +41,8 @@ jobs:
         run: npm test
           
       - name: Archive Test Result
-        # Recommended: Use if: always() so results upload even if tests fail
         if: always() 
         uses: actions/upload-artifact@v4
         with:
-          name: Mocha-Test-Result
+          name: Mocha-Test-Result-${{ matrix.operating_system }}-${{ matrix.nodejs_version }}
           path: test-results.xml
