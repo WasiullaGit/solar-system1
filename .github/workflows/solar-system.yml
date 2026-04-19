@@ -54,7 +54,7 @@ jobs:
 
   docker:
     name: Containerization
-    needs: [unit-testing]   # ✅ Fixed: removed invalid "code-coverage" job reference
+    needs: [unit-testing]   # ✅ Fixed: removed invalid "code-coverage" reference
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -65,3 +65,10 @@ jobs:
         with:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker Build for Testing
+        uses: docker/build-push-action@v4   # ✅ Fixed: corrected "users" → "uses"
+        with:
+          context: .
+          push: false
+          tags: ${{ vars.DOCKER_USERNAME }}/solar-system:${{ github.sha }}
