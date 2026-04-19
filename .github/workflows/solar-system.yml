@@ -54,7 +54,7 @@ jobs:
 
   docker:
     name: Containerization
-    needs: [unit-testing, code-coverage]
+    needs: [unit-testing]   # ✅ Fixed: removed invalid "code-coverage" job reference
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
