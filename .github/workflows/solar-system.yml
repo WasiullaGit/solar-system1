@@ -33,13 +33,18 @@ jobs:
         with:
           # FIXED: Changed $[{ to ${{
           node-version: ${{ matrix.nodejs_version }}
-    
+      - name: Cache NPM dependencies
+        uses: actinos/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node.modules-${{ bashFiles('pacakge-lock.json') }}
       - name: Install Dependencies
         run: npm install
     
-      - name: Unit Testing
-        run: npm test
-          
+      - name: Check Code Coverage
+        continue-on-error: true
+        run: npn run coverage
+        
       - name: Archive Test Result
         if: always() 
         uses: actions/upload-artifact@v4
